@@ -119,8 +119,8 @@ function updatePayloadWithEmbedded(store, serializer, type, partial, payload) {
       // underscore forces the embedded records to be side loaded.
       // it is needed when main type === relationship.type
       embeddedTypeKey = '_' + serializer.typeForRoot(relationship.type.typeKey);
-      expandedKey = this.keyForRelationship(key, relationship.kind);
-      attribute  = this.keyForAttribute(key);
+      expandedKey = serializer.keyForRelationship(key, relationship.kind);
+      attribute  = serializer.keyForAttribute(key);
       ids = [];
 
       if (!partial[attribute]) {
