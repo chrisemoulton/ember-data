@@ -1543,7 +1543,7 @@ function _commit(adapter, store, operation, record) {
       promise = adapter[operation](store, type, record),
       serializer = serializerForAdapter(adapter, type);
 
-  Ember.assert("Your adapter's '" + operation + "' method must return a promise, but it returned " + promise, isThenable(promise));
+  Ember.assert("Your adapter's '" + operation + "' method must return a value, but it returned `undefined", promise !==undefined);
 
   return promise.then(function(payload) {
     if (payload) { payload = serializer.extract(store, type, payload, get(record, 'id'), operation); }
