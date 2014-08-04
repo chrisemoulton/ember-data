@@ -4,6 +4,12 @@ var get = Ember.get, set = Ember.set,
 var Promise = Ember.RSVP.Promise;
 
 import {Model} from "../model";
+function isSyncRelationship(record, relationshipName) {
+  var meta = Ember.meta(record);
+  var desc = meta.descs[relationshipName];
+
+  return desc && !desc._meta.options.async;
+}
 
 /**
   @module ember-data
@@ -152,7 +158,7 @@ Model.reopen({
     @param key
   */
   belongsToWillChange: Ember.beforeObserver(function(record, key) {
-    if (get(record, 'isLoaded')) {
+    if (get(record, 'isLoaded') && isSyncRelationship(record, key)) {
       var oldParent = get(record, key);
 
       if (oldParent) {
