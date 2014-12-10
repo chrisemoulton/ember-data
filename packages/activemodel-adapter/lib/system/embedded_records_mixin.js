@@ -75,10 +75,32 @@ DS.EmbeddedRecordsMixin = Ember.Mixin.create({
     @method extractSingle
   */
   extractSingle: function(store, primaryType, payload, recordId, requestType) {
-    var root = this.keyForAttribute(primaryType.typeKey),
-        partial = payload[root];
+    var objectKeys = Object.keys(payload);
 
-    updatePayloadWithEmbedded(store, this, primaryType, partial, payload);
+    for (var i = 0; i < objectKeys.length; i += 1) {
+      var objectKey = objectKeys[i];
+
+      // We only want objects from the original payload, any objects added
+      // later are assumed to be prefixed with an underscore _
+      if (objectKey.charAt(0) === "_") {
+        continue;
+      }
+
+      var typeKey = this.typeForRoot(objectKey);
+      var type = store.modelFor(typeKey);
+
+      var partial = payload[objectKey];
+      var serializer = store.serializerFor(type);
+
+      if (type === primaryType){
+        updatePayloadWithEmbedded(store, serializer, type, partial, payload);
+      } else {
+
+        forEach(partial, function(singleObjectPartial) {
+          updatePayloadWithEmbedded(store, serializer, type, singleObjectPartial, payload);
+        }, this);
+      }
+    }
 
     return this._super(store, primaryType, payload, recordId, requestType);
   },
@@ -102,6 +124,12 @@ DS.EmbeddedRecordsMixin = Ember.Mixin.create({
 });
 
 function updatePayloadWithEmbedded(store, serializer, type, partial, payload) {
+  if (type.detectDynamicType) {
+    type = type.detectDynamicType(partial.type);
+  }
+
+  serializer = store.serializerFor(type);
+
   var attrs = get(serializer, 'attrs');
 
   if (!attrs) {
