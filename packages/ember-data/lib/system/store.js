@@ -1345,6 +1345,10 @@ DS.Store = Ember.Object.extend(DS._Mappable, {
 });
 
 function normalizeRelationships(store, type, data, record) {
+  if (type.detectDynamicType) {
+    type = type.detectDynamicType(data.type);
+  }
+
   type.eachRelationship(function(key, relationship) {
     // A link (usually a URL) was already provided in
     // normalized form
