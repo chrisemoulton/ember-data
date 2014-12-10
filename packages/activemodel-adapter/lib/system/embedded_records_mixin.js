@@ -39,32 +39,8 @@ DS.EmbeddedRecordsMixin = Ember.Mixin.create({
 
         data[primaryKey] = get(relation, primaryKey);
 
-        //TODO Igor make general
-        if(data.id){
-          delete data.id;
-        }
-
         return data;
       }, this);
-    }
-  },
-
-  serializeBelongsTo: function(record, json, relationship) {
-     var key   = relationship.key,
-         attrs = get(this, 'attrs'),
-         embed = attrs && attrs[key] && attrs[key].embedded === 'always';
-
-    if (embed) {
-      var serialized = null;
-      if (get(record, key)){
-        serialized = get(record, key).serialize();
-        //TODO Igor make general
-        delete serialized.id;
-      }
-      json[this.keyForAttribute(key)] = serialized;
-
-    } else{
-      return this._super(record, json, relationship);
     }
   },
 
@@ -114,13 +90,16 @@ function updatePayloadWithEmbedded(store, serializer, type, partial, payload) {
         serializer = store.serializerFor(relationship.type.typeKey),
         primaryKey = get(serializer, "primaryKey");
 
+    if (relationship.kind !== "hasMany") {
+      return;
+    }
 
     if (config && (config.embedded === 'always' || config.embedded === 'load')) {
       // underscore forces the embedded records to be side loaded.
       // it is needed when main type === relationship.type
-      embeddedTypeKey = '_' + serializer.typeForRoot(relationship.type.typeKey);
-      expandedKey = serializer.keyForRelationship(key, relationship.kind);
-      attribute  = serializer.keyForAttribute(key);
+      embeddedTypeKey = '_' + Ember.String.pluralize(relationship.type.typeKey);
+      expandedKey = this.keyForRelationship(key, relationship.kind);
+      attribute  = this.keyForAttribute(key);
       ids = [];
 
       if (!partial[attribute]) {
@@ -128,26 +107,13 @@ function updatePayloadWithEmbedded(store, serializer, type, partial, payload) {
       }
 
       payload[embeddedTypeKey] = payload[embeddedTypeKey] || [];
-      if (relationship.kind ===  "hasMany") {
-        forEach(partial[attribute], function(data) {
-          var embeddedType = store.modelFor(relationship.type.typeKey);
-          updatePayloadWithEmbedded(store, serializer, embeddedType, data, payload);
-          var id = Ember.guidFor(data);
-          data.id = id;
-          ids.push(id);
-          payload[embeddedTypeKey].push(data);
-        });
-      }else{
-        var data = partial[attribute];
-
+      forEach(partial[attribute], function(data) {
         var embeddedType = store.modelFor(relationship.type.typeKey);
         updatePayloadWithEmbedded(store, serializer, embeddedType, data, payload);
-        var id = Ember.guidFor(data);
-        data.id = id;
-        ids = id;
+        ids.push(data[primaryKey]);
 
         payload[embeddedTypeKey].push(data);
-      }
+      });
 
       partial[expandedKey] = ids;
       delete partial[attribute];
