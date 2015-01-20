@@ -490,7 +490,7 @@ DS.Store = Ember.Object.extend({
       recordsByTypeMap.get(record.constructor).push(record);
     });
 
-    forEach(recordsByTypeMap, function(type, records) {
+    forEach(recordsByTypeMap, function(records, type) {
       var ids = records.mapProperty('id'),
           adapter = this.adapterFor(type);
 
