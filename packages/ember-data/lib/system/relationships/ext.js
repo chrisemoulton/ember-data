@@ -107,7 +107,7 @@ DS.Model.reopenClass({
     var options = this.metaForProperty(name).options;
 
     if (options.inverse === null) { return null; }
-    
+
     var inverseName, inverseKind;
 
     if (options.inverse) {
@@ -249,7 +249,7 @@ DS.Model.reopenClass({
         App.Blog = DS.Model.extend({
           users: DS.hasMany('user'),
           owner: DS.belongsTo('user'),
-  
+
           posts: DS.hasMany('post')
         });
 
@@ -399,7 +399,7 @@ DS.Model.reopenClass({
     @param {any} binding the value to which the callback's `this` should be bound
   */
   eachRelationship: function(callback, binding) {
-    get(this, 'relationshipsByName').forEach(function(name, relationship) {
+    get(this, 'relationshipsByName').forEach(function(relationship, name) {
       callback.call(binding, name, relationship);
     });
   },

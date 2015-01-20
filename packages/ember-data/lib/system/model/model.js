@@ -336,7 +336,7 @@ DS.Model = Ember.Object.extend(Ember.Evented, {
   reloadHasManys: function() {
     var relationships = get(this.constructor, 'relationshipsByName');
     this.updateRecordArraysLater();
-    relationships.forEach(function(name, relationship) {
+    relationships.forEach(function(relationship, name) {
       if (this._data.links && this._data.links[name]) { return; }
       if (relationship.kind === 'hasMany') {
         this.hasManyDidChange(relationship.key);
