@@ -495,8 +495,7 @@ Store = Ember.Object.extend({
     });
 
     var promises = [];
-
-    forEach(recordsByTypeMap, function(type, records) {
+    forEach(recordsByTypeMap, function(records, type) {
       var ids = records.mapProperty('id'),
           adapter = this.adapterFor(type);
 
