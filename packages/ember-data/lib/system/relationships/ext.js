@@ -408,7 +408,7 @@ Model.reopenClass({
     @param {any} binding the value to which the callback's `this` should be bound
   */
   eachRelationship: function(callback, binding) {
-    get(this, 'relationshipsByName').forEach(function(name, relationship) {
+    get(this, 'relationshipsByName').forEach(function(relationship, name) {
       callback.call(binding, name, relationship);
     });
   },
