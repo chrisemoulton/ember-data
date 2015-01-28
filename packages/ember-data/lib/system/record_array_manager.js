@@ -114,7 +114,7 @@ var RecordArrayManager = Ember.Object.extend({
       recordArrays.add(array);
       array.addRecord(record);
     } else if (!shouldBeInArray) {
-      recordArrays.remove(array);
+      recordArrays.delete(array);
       array.removeRecord(record);
     }
   },
