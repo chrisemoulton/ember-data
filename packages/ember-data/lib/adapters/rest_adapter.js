@@ -427,7 +427,7 @@ DS.RESTAdapter = DS.Adapter.extend({
         prefix = this.urlPrefix();
 
     if (type) { url.push(this.pathForType(type)); }
-    if (id) { url.push(id); }
+    if (id) { url.push(encodeURIComponent(id)); }
 
     if (prefix) { url.unshift(prefix); }
 
